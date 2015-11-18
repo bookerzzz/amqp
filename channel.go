@@ -8,6 +8,8 @@ package amqp
 import (
 	"reflect"
 	"sync"
+	"fmt"
+	"time"
 )
 
 // 0      1         3             7                  size+7 size+8
@@ -67,6 +69,9 @@ type Channel struct {
 	// only be mutated in shutdown()
 	send func(*Channel, message) error
 
+	// Maximum time to wait on each call
+	callTimeout time.Duration
+
 	// Current state for frame re-assembly, only mutated from recv
 	message messageWithContent
 	header  *headerFrame
@@ -74,7 +79,7 @@ type Channel struct {
 }
 
 // Constructs a new channel with the given framing rules
-func newChannel(c *Connection, id uint16) *Channel {
+func newChannel(c *Connection, id uint16, callTimeout time.Duration) *Channel {
 	return &Channel{
 		connection: c,
 		id:         id,
@@ -84,6 +89,7 @@ func newChannel(c *Connection, id uint16) *Channel {
 		recv:       (*Channel).recvMethod,
 		send:       (*Channel).sendOpen,
 		errors:     make(chan *Error, 1),
+		callTimeout: callTimeout,
 	}
 }
 
@@ -147,6 +153,10 @@ func (me *Channel) call(req message, res ...message) error {
 
 	if req.wait() {
 		select {
+		case <- time.After(me.callTimeout):
+			id1, id2 := req.id()
+			return fmt.Errorf("call (%d, %d) timed out after %v", id1, id2, me.callTimeout)
+
 		case e := <-me.errors:
 			return e
 

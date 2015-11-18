@@ -535,7 +535,7 @@ func (me *Connection) isCapable(featureName string) bool {
 // allocateChannel records but does not open a new channel with a unique id.
 // This method is the initial part of the channel lifecycle and paired with
 // releaseChannel
-func (me *Connection) allocateChannel() (*Channel, error) {
+func (me *Connection) allocateChannel(callTimeout time.Duration) (*Channel, error) {
 	me.m.Lock()
 	defer me.m.Unlock()
 
@@ -544,7 +544,7 @@ func (me *Connection) allocateChannel() (*Channel, error) {
 		return nil, ErrChannelMax
 	}
 
-	ch := newChannel(me, uint16(id))
+	ch := newChannel(me, uint16(id), callTimeout)
 	me.channels[uint16(id)] = ch
 
 	return ch, nil
@@ -561,8 +561,8 @@ func (me *Connection) releaseChannel(id uint16) {
 }
 
 // openChannel allocates and opens a channel, must be paired with closeChannel
-func (me *Connection) openChannel() (*Channel, error) {
-	ch, err := me.allocateChannel()
+func (me *Connection) openChannel(callTimeout time.Duration) (*Channel, error) {
+	ch, err := me.allocateChannel(callTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -587,8 +587,8 @@ messages.  Any error from methods on this receiver will render the receiver
 invalid and a new Channel should be opened.
 
 */
-func (me *Connection) Channel() (*Channel, error) {
-	return me.openChannel()
+func (me *Connection) Channel(callTimeout time.Duration) (*Channel, error) {
+	return me.openChannel(callTimeout)
 }
 
 func (me *Connection) call(req message, res ...message) error {

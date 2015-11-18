@@ -248,7 +248,7 @@ func TestChannelOpen(t *testing.T) {
 		t.Fatalf("could not create connection: %v (%s)", c, err)
 	}
 
-	ch, err := c.Channel()
+	ch, err := c.Channel(time.Minute)
 	if err != nil {
 		t.Fatalf("could not open channel: %v (%s)", ch, err)
 	}
@@ -347,7 +347,7 @@ func TestConfirmMultipleOrdersDeliveryTags(t *testing.T) {
 		t.Fatalf("could not create connection: %v (%s)", c, err)
 	}
 
-	ch, err := c.Channel()
+	ch, err := c.Channel(time.Minute)
 	if err != nil {
 		t.Fatalf("could not open channel: %v (%s)", ch, err)
 	}
@@ -400,7 +400,7 @@ func TestNotifyClosesReusedPublisherConfirmChan(t *testing.T) {
 		t.Fatalf("could not create connection: %v (%s)", c, err)
 	}
 
-	ch, err := c.Channel()
+	ch, err := c.Channel(time.Minute)
 	if err != nil {
 		t.Fatalf("could not open channel: %v (%s)", ch, err)
 	}
@@ -433,7 +433,7 @@ func TestNotifyClosesAllChansAfterConnectionClose(t *testing.T) {
 		t.Fatalf("could not create connection: %v (%s)", c, err)
 	}
 
-	ch, err := c.Channel()
+	ch, err := c.Channel(time.Minute)
 	if err != nil {
 		t.Fatalf("could not open channel: %v (%s)", ch, err)
 	}
@@ -511,7 +511,7 @@ func TestPublishBodySliceIssue74(t *testing.T) {
 		t.Fatalf("could not create connection: %v (%s)", c, err)
 	}
 
-	ch, err := c.Channel()
+	ch, err := c.Channel(time.Minute)
 	if err != nil {
 		t.Fatalf("could not open channel: %v (%s)", ch, err)
 	}
@@ -540,7 +540,7 @@ func TestPublishAndShutdownDeadlockIssue84(t *testing.T) {
 		t.Fatalf("couldn't create connection: %v (%s)", c, err)
 	}
 
-	ch, err := c.Channel()
+	ch, err := c.Channel(time.Minute)
 	if err != nil {
 		t.Fatalf("couldn't open channel: %v (%s)", ch, err)
 	}
