@@ -327,6 +327,7 @@ func TestConfirmMultipleOrdersDeliveryTags(t *testing.T) {
 		// Single tag, plus multiple, should produce
 		// 2, 1, 3, 4
 		srv.send(1, &basicAck{DeliveryTag: 2})
+		srv.send(1, &basicAck{DeliveryTag: 1})
 		srv.send(1, &basicAck{DeliveryTag: 4, Multiple: true})
 
 		srv.recv(1, &basicPublish{})
